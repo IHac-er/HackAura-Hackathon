@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Basic Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        
+        /* Header Section */
+        .hero {
+            background-color: #4a8e8e;
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .hero .button {
+            background-color: #ffa500;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .hero .button:hover {
+            background-color: #ffcc80;
+        }
+
+        /* Navigation Menu */
+        .nav {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .nav ul li a:hover {
+            color: #ffcc80;
+        }
+
+        /* Chatbot Button */
+        .chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .chatbot-button:hover {
+            background-color: #66bb6a;
+            transform: scale(1.1);
+        }
+
+        /* Chat Popup */
+        .chat-popup {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            width: 400px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .chat-popup header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .chat-body {
+            padding: 10px;
+            height: 500px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .chat-input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 0;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .send-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .send-button:hover {
+            background-color: #66bb6a;
+        }
+
+        .microphone-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 5px;
+            border-radius: 50%;
+        }
+
+        .microphone-button:hover {
+            background-color: #66bb6a;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chat-popup {
+                width: 90%;
+                left: 5%;
+            }
+        }
+        .mood-tracker-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .mood-emojis {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        .emoji:hover {
+            transform: scale(1.2);
+            transition: transform 0.2s;
+        }
+
+        #selectedMoodMessage {
+            margin-top: 15px;
+            font-size: 20px;
+            color: #4CAF50;
+        }
+
+        /* User Info Section Styling */
+        .user-info-container {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .user-info-container h3 {
+            font-size: 24px;
+            color: #4a8e8e;
+            margin-bottom: 10px;
+        }
+
+        .user-info-container textarea {
+            width: 100%;
+            max-width: 600px;
+            height: 100px;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            resize: none; /* Prevent resizing */
+            outline: none;
+        }
+
+        .user-info-container textarea:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        #wordCount {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* Contacts Section Styling */
+        .contacts-container {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .contacts-container h3 {
+            font-size: 24px;
+            color: #4a8e8e;
+            margin-bottom: 15px;
+        }
+
+        #contactsList {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .contact-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .contact-input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        .contacts-container button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .contacts-container button:hover {
+            background-color: #66bb6a;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header class="hero">
+        <div class="container">
+            <h1>Mental Health Matters</h1>
+            <p>Your well-being is our priority. We're here to support you every step of the way.</p>
+            <a href="https://www.who.int/india/health-topics/mental-health" class="button" target="_blank">Explore Resources</a>
+        </div>
+    </header>
+
+    <div class="mood-tracker-container">
+        <h3>How are you feeling today?</h3>
+        <div class="mood-emojis">
+            <span class="emoji" onclick="setMood('happy')">😁</span>
+            <span class="emoji" onclick="setMood('content')">😊</span>
+            <span class="emoji" onclick="setMood('neutral')">😐</span>
+            <span class="emoji" onclick="setMood('sad')">😔</span>
+            <span class="emoji" onclick="setMood('very_sad')">😢</span>
+        </div>
+        <div id="selectedMoodMessage"></div>
+    </div>
+
+    <div class="user-info-container">
+        <h3>Tell us about yourself</h3>
+        <textarea id="userDetails" rows="5" maxlength="2000" 
+                  oninput="updateWordCount()" 
+                  placeholder="Type a short bio about yourself..."></textarea>
+        <p id="wordCount">0 / 400 words</p>
+    </div>
+
+    <div class="contacts-container">
+        <h3>Add Emergency Contacts</h3>
+        <div id="contactsList">
+            <input type="text" class="contact-input" placeholder="Enter phone number" />
+        </div>
+        <button onclick="addContact()">Add Another Contact</button>
+    </div>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-button" onclick="toggleChat()">
+        <i class="fas fa-comment-alt"></i>
+    </button>
+
+    <!-- Chat Popup -->
+    <div class="chat-popup" id="chatPopup">
+        <header>Chat with Lucy</header>
+        <div class="chat-body" id="chatBody">
+            <p><strong>Lucy:</strong> Hi! How can I support you today?</p>
+        </div>
+        <div class="chat-input-container">
+            <button class="microphone-button" onclick="startListening()">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <input type="text" id="userInput" class="chat-input" placeholder="Type your message...">
+            <button class="send-button" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const chatPopup = document.getElementById('chatPopup');
+            chatPopup.style.display = chatPopup.style.display === 'none' ? 'block' : 'none';
+        }
+
+        document.getElementById('userInput').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function startListening() {
+            const userInput = document.getElementById('userInput');
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+            recognition.onstart = function () {
+                console.log("Voice recognition started. Speak into the microphone.");
+            };
+
+            recognition.onresult = function (event) {
+                const transcript = event.results[0][0].transcript;
+                userInput.value += transcript; // Append recognized text to the input
+                userInput.focus(); // Set focus back to the input
+            };
+
+            recognition.onerror = function (event) {
+                console.error("Error occurred in recognition: " + event.error);
+            };
+
+            recognition.onend = function () {
+                console.log("Voice recognition ended.");
+            };
+
+            recognition.start();
+        }
+
+        let selectedMood = "neutral"; // Default mood
+
+        function setMood(mood) {
+            selectedMood = mood;
+            document.getElementById('selectedMoodMessage').innerText = `You selected: ${mood}`;
+        }
+
+        // Track word count in the textarea
+        function updateWordCount() {
+            const text = document.getElementById('userDetails').value;
+            const words = text.trim().split(/\s+/).filter(word => word !== "").length;
+            const wordCountElement = document.getElementById('wordCount');
+            
+            if (words > 400) {
+                wordCountElement.style.color = 'red'; // Indicate word limit exceeded
+            } else {
+                wordCountElement.style.color = 'black';
+            }
+            wordCountElement.textContent = `${words} / 400 words`;
+        }
+
+        let contacts = [];  // Store contact numbers
+
+        function addContact() {
+            const contactList = document.getElementById('contactsList');
+            const newContact = document.createElement('input');
+            newContact.type = 'text';
+            newContact.className = 'contact-input';
+            newContact.placeholder = 'Enter phone number';
+            contactList.appendChild(newContact);
+        }
+
+        function getContacts() {
+            const inputs = document.querySelectorAll('.contact-input');
+            contacts = Array.from(inputs).map(input => input.value).filter(num => num);
+        }
+
+        // Modify sendMessage to include contact checking logic
+        function sendMessage() {
+            const userInput = document.getElementById('userInput').value;
+            getContacts();  // Retrieve contacts from inputs
+
+            if (userInput.trim()) {
+                const chatBody = document.getElementById('chatBody');
+                chatBody.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+                document.getElementById('userInput').value = '';
+
+                chatBody.innerHTML += `<p><em>Lucy is typing...</em></p>`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+
+                // Send data to the backend
+                fetch("/get_response", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: userInput,
+                        mood: selectedMood,
+                        contacts: contacts  // Include contacts in the payload
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    chatBody.innerHTML = chatBody.innerHTML.replace(`<p><em>Lucy is typing...</em></p>`, '');
+                    chatBody.innerHTML += `<p><strong>Lucy:</strong> ${data.response}</p>`;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+
+                    // If message expresses sorrow, trigger alert
+                    if (selectedMood === 'very_sad' || userInput.toLowerCase().includes('help')) {
+                        notifyContacts();
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        }
+
+        function notifyContacts() {
+            alert('Notifying emergency contacts...');
+            fetch("/send_alert", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contacts: contacts }),
+            })
+            .then(response => response.json())
+            .then(data => console.log('Alert sent:', data))
+            .catch(error => console.error('Error sending alert:', error));
+        }
+    </script>
+</body>
+
+</html>
